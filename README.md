@@ -26,8 +26,8 @@ Clone this repository in to the Sublime Text 2 or 3 "Packages" directory, which 
 "Preferences" -> "Browse Packages" option in Sublime Text takes you.
 
 ## Thanks to
-[titoBouzot](https://github.com/titoBouzout) - ST3 compatibility, fixes & additions
-[earshinov](https://github.com/earshinov) - base64 fixes
+• [titoBouzot](https://github.com/titoBouzout) - ST3 compatibility, fixes & additions
+• [earshinov](https://github.com/earshinov) - base64 fixes
 
 
 ## License
