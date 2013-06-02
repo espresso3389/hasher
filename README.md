@@ -25,6 +25,11 @@ This is not supported yet. When Sublime Text 3 is released, the ST3 branch will 
 Clone this repository in to the Sublime Text 2 or 3 "Packages" directory, which is located where ever the
 "Preferences" -> "Browse Packages" option in Sublime Text takes you.
 
+## Thanks to
+[titoBouzot](https://github.com/titoBouzout) - ST3 compatibility, fixes & additions
+[earshinov](https://github.com/earshinov) - base64 fixes
+
+
 ## License
 Copyright (C) 2012 Dino Angelov
 
