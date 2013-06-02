@@ -4,19 +4,21 @@ import urllib
 import time
 import base64
 import re
+import html.parser
 
-# test
+# test http://dmoz.org/World/Español <b>Català, Español, Français, 日本語, Русский</b>
 
 class Md5Command(sublime_plugin.TextCommand):
 	def run(self, edit):
 		for s in self.view.sel():
 			if s.empty():
 				s = self.view.word(s)
+			txt = self.view.substr(s)
 
-			selected = self.view.substr(s).encode('utf8')
 			m = hashlib.md5()
-			m.update(selected)
+			m.update(txt.encode('utf-8'))
 			txt = m.hexdigest()
+
 			self.view.replace(edit, s, txt)
 
 class Sha1Command(sublime_plugin.TextCommand):
@@ -24,11 +26,12 @@ class Sha1Command(sublime_plugin.TextCommand):
 		for s in self.view.sel():
 			if s.empty():
 				s = self.view.word(s)
+			txt = self.view.substr(s)
 
-			selected = self.view.substr(s).encode('utf8')
 			m = hashlib.sha1()
-			m.update(selected)
+			m.update(txt.encode('utf-8'))
 			txt = m.hexdigest()
+
 			self.view.replace(edit, s, txt)
 
 class Base64EncodeCommand(sublime_plugin.TextCommand):
@@ -36,9 +39,10 @@ class Base64EncodeCommand(sublime_plugin.TextCommand):
 		for s in self.view.sel():
 			if s.empty():
 				s = self.view.word(s)
+			txt = self.view.substr(s)
 
-			selected = self.view.substr(s).encode('utf8')
-			txt = base64.b64encode(selected)
+			txt = base64.b64encode(txt.encode('utf-8')).decode('utf-8')
+
 			self.view.replace(edit, s, txt)
 
 class Base64DecodeCommand(sublime_plugin.TextCommand):
@@ -46,14 +50,14 @@ class Base64DecodeCommand(sublime_plugin.TextCommand):
 		for s in self.view.sel():
 			if s.empty():
 				s = self.view.word(s)
-
-			selected = self.view.substr(s)
+			txt = self.view.substr(s)
 
 			# pad to 4 characters
-			if len(selected) % 4 != 0:
-				selected += "=" * (4 - len(selected) % 4)
+			if len(txt) % 4 != 0:
+				txt += "=" * (4 - len(txt) % 4)
 
-			txt = base64.b64decode(selected).decode('utf8')
+			txt = base64.b64decode(txt).decode('utf-8')
+
 			self.view.replace(edit, s, txt)
 
 class UriComponentEncodeCommand(sublime_plugin.TextCommand):
@@ -61,9 +65,21 @@ class UriComponentEncodeCommand(sublime_plugin.TextCommand):
 		for s in self.view.sel():
 			if s.empty():
 				s = self.view.word(s)
+			txt = self.view.substr(s)
 
-			selected = self.view.substr(s)
-			txt = urllib.quote(selected.encode('utf8'), '')
+			txt = urllib.parse.quote(txt, safe='~()*!.\'')
+
+			self.view.replace(edit, s, txt)
+
+class UriEncodeCommand(sublime_plugin.TextCommand):
+	def run(self, edit):
+		for s in self.view.sel():
+			if s.empty():
+				s = self.view.word(s)
+			txt = self.view.substr(s)
+
+			txt = urllib.parse.quote(txt, safe='~@#$&()*!+=:;,.?/\'')
+
 			self.view.replace(edit, s, txt)
 
 class UriComponentDecodeCommand(sublime_plugin.TextCommand):
@@ -71,46 +87,57 @@ class UriComponentDecodeCommand(sublime_plugin.TextCommand):
 		for s in self.view.sel():
 			if s.empty():
 				s = self.view.word(s)
+			txt = self.view.substr(s)
 
-			selected = self.view.substr(s)
-			txt = urllib.unquote(selected.encode('utf8'))
-			txt = unicode(txt.decode('utf8'));
+			txt = urllib.parse.unquote(txt)
+
 			self.view.replace(edit, s, txt);
 
-class EntityEncodeCommand(sublime_plugin.TextCommand):
-	def run(self, edit):
-		from htmlentitydefs import codepoint2name as cp2n
-		for s in self.view.sel():
-			if s.empty():
-							s = self.view.word(s)
-			buf = []
-			for pt in xrange(s.begin(), s.end()):
-				ch = self.view.substr(pt)
-				ch_ord = ord(ch)
-				try:
-					ch = '&%s;' % cp2n[ch_ord]
-				except:
-					pass
-				buf.append(ch)
-			self.view.replace(edit, s, ''.join(buf));
-
-class EntityDecodeCommand(sublime_plugin.TextCommand):
+class HtmlEntityEncodeCommand(sublime_plugin.TextCommand):
 	def run(self, edit):
 		for s in self.view.sel():
 			if s.empty():
 				s = self.view.word(s)
+			txt = self.view.substr(s)
 
-			selected = unicode(self.view.substr(s))
-			import HTMLParser
-			HTMLParser = HTMLParser.HTMLParser()
-			selected = HTMLParser.unescape(selected)
-			self.view.replace(edit, s, selected);
+			txt = txt.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("'", "&apos;").replace('"', "&quot;")
+
+			self.view.replace(edit, s, txt);
+
+class HtmlEntityEncodeAllCommand(sublime_plugin.TextCommand):
+	def run(self, edit):
+		for s in self.view.sel():
+			if s.empty():
+				s = self.view.word(s)
+			txt = self.view.substr(s)
+
+			txt = txt.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("'", "&apos;").replace('"', "&quot;").encode('ascii', errors='xmlcharrefreplace').decode('utf-8');
+
+			self.view.replace(edit, s, txt);
+
+class HtmlEntityDecodeCommand(sublime_plugin.TextCommand):
+	def run(self, edit):
+		for s in self.view.sel():
+			if s.empty():
+				s = self.view.word(s)
+			txt = self.view.substr(s)
+
+			txt = html.parser.HTMLParser().unescape(txt)
+
+			self.view.replace(edit, s, txt);
 
 class CurrentUnixTimestamp(sublime_plugin.TextCommand):
 	def run(self, edit):
 		for s in self.view.sel():
-
 			txt = time.asctime(time.gmtime())
 			txt = time.ctime()
 			txt = "%.0f" % round(time.time(), 3)
 			self.view.replace(edit, s, txt)
+
+# disable default command
+from HTML.encode_html_entities import *
+class EncodeHtmlEntities(sublime_plugin.TextCommand):
+	def is_visible(self):
+		return False
+	def is_enabled(self):
+		return False
