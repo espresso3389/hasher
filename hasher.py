@@ -34,6 +34,32 @@ class Sha1Command(sublime_plugin.TextCommand):
 
 			self.view.replace(edit, s, txt)
 
+class Sha256Command(sublime_plugin.TextCommand):
+	def run(self, edit):
+		for s in self.view.sel():
+			if s.empty():
+				s = self.view.word(s)
+			txt = self.view.substr(s)
+
+			m = hashlib.sha256()
+			m.update(txt.encode('utf-8'))
+			txt = m.hexdigest()
+
+			self.view.replace(edit, s, txt)
+
+class Sha512Command(sublime_plugin.TextCommand):
+	def run(self, edit):
+		for s in self.view.sel():
+			if s.empty():
+				s = self.view.word(s)
+			txt = self.view.substr(s)
+
+			m = hashlib.sha512()
+			m.update(txt.encode('utf-8'))
+			txt = m.hexdigest()
+
+			self.view.replace(edit, s, txt)
+
 class Base64EncodeCommand(sublime_plugin.TextCommand):
 	def run(self, edit):
 		for s in self.view.sel():
