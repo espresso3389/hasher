@@ -1,11 +1,16 @@
 # String Hasher
 
-Note: This is the Sublime Text 3 plugin. Please see use the [master branch](https://github.com/dangelov/hasher) for ST2.
+This is a Sublime Text 3 plugin based on a work by Dino Angelov.
+I added SHA256/SHA512 feature on the original ST3 branch. See the following branch for more information:
+
+https://github.com/espresso3389/hasher/tree/ST3
 
 Hasher is a small Sublime Text 2 & 3 Plugin that generates hashes from the selected text. Currently supported:
 
 * MD5
 * SHA1
+* SHA256
+* SHA512
 * Base64 Encode
 * Base64 Decode
 * URI Component Encode
